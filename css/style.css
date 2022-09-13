@@ -82,3 +82,11 @@ p {
 .bg_btn_gray {
   background: darkgrey;
 }
+
+.btn:hover {
+  filter: brightness(130%);
+}
+
+.btn:active {
+  filter: brightness(80%);
+}
