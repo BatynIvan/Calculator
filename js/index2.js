@@ -1,20 +1,20 @@
-const user = {
-  name: 'Ivan',
-  secondName: 'Batyn',
-  age: 26,
-  dateOfBirth: '22.02.1996',
-  nationality: 'Ukraine',
-  hobby: 'Squash',
-  phoneNumber: +380969269777,
-  city: 'Uzzhorod',
-  street: 'Svobody',
-  numberStreet: 51,
-}
-// console.log(user.street);
+// const user = {
+//   name: 'Ivan',
+//   secondName: 'Batyn',
+//   age: 26,
+//   dateOfBirth: '22.02.1996',
+//   nationality: 'Ukraine',
+//   hobby: 'Squash',
+//   phoneNumber: +380969269777,
+//   city: 'Uzzhorod',
+//   street: 'Svobody',
+//   numberStreet: 51,
+// }
+// // console.log(user.street);
 
-for (let value in user) {
-  console.log(user[value]);
-}
+// for (let value in user) {
+//   console.log(user[value]);
+// }
 
 
 
@@ -33,3 +33,5 @@ for (let value in user) {
 // };
 // let info = new UserInfo()
 // console.log(info.name);
+
+
