@@ -21,25 +21,25 @@
     </div>
 
     <div class="buttons">
-      <div class="btn bg_btn_gray" id="ac" onclick="ac()">ac</div>
+      <div class="btn bg_btn_gray" id="ac" onclick="clearInput()">ac</div>
       <div class="btn bg_btn_gray" onclick="insert('+/-')">+/-</div>
       <div class="btn bg_btn_gray" onclick="insert('%')">%</div>
-      <div class="btn bg_btn_orange" onclick="insert('/', true)">/</div>
+      <div class="btn bg_btn_orange" onclick="insert(' / ', true)">/</div>
 
       <div class="btn" onclick="insert('7')">7</div>
       <div class="btn" onclick="insert('8')">8</div>
       <div class="btn" onclick="insert('9')">9</div>
-      <div class="btn bg_btn_orange" onclick="insert('*', true)">*</div>
+      <div class="btn bg_btn_orange" onclick="insert(' * ', true)">*</div>
 
       <div class="btn" onclick="insert('4')">4</div>
       <div class="btn" onclick="insert('5')">5</div>
       <div class="btn" onclick="insert('6')">6</div>
-      <div class="btn bg_btn_orange" onclick="insert('-', true)">-</div>
+      <div class="btn bg_btn_orange" onclick="insert(' - ', true)">-</div>
 
       <div class="btn" onclick="insert('1')">1</div>
       <div class="btn" onclick="insert('2')">2</div>
       <div class="btn" onclick="insert('3')">3</div>
-      <div class="btn bg_btn_orange" onclick="insert('+', true)">+</div>
+      <div class="btn bg_btn_orange" onclick="insert(' + ', true)">+</div>
 
       <div class="btn zero" onclick="insert('0')">0</div>
       <div class="btn" onclick="insert('.')">.</div>
@@ -47,6 +47,7 @@
     </div>
   </div>
 <script>
+
   let isLastEqual = false;
   function equal() {
     const input = document.getElementById('res').value;
@@ -59,6 +60,7 @@
       "*": (num1, num2) => Math.round((num1 * num2) * 10000)/10000,
       "/": (num1, num2) => Math.round((num1 / num2)*10000)/10000,
     }
+    // FIXME: Why we need that part?
     const num1 = parseFloat(resultNumber[0]);
     const num2 = parseFloat(resultNumber[1]); 
     
@@ -70,75 +72,55 @@
       isLastEqual = true;
     }
 
-
     if (resultNumber.length > 2) {
-      const input = document.getElementById('res').value;
-      // ((...args) => { console.log(args) })(...input)
+      const resultNumber = input.split(' '); // split by space FIXME: BAD NAMING
 
-      const resultNumber = input.split('');
-      console.log(input);
-      console.log(resultNumber);
-      
-       for (let i = 0; i < resultNumber.length; i++) {
-
+       for (let i = 0; i < resultNumber.length; i++) { // TODO: investigate different approach with recursion.
+        // FIXME: duplicate code
         if(resultNumber.includes('*')) {
           const firstOperation = resultNumber.findIndex(item => item == '*');
           const previousNumber = Number(resultNumber[firstOperation - 1]);
           const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
 
           if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber * afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
+            const result = String(previousNumber * afterNumber);
+            resultNumber.splice(firstOperation - 1, 3, result);
+            document.getElementById('res').value = result;
           }
         }
+
         if (resultNumber.includes('/')) {
           const firstOperation = resultNumber.findIndex(item => item == '/');
           const previousNumber = Number(resultNumber[firstOperation - 1]);
           const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
 
           if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber / afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
+            const result = String(previousNumber / afterNumber);
+            resultNumber.splice(firstOperation - 1, 3, result);
+            document.getElementById('res').value = result;
           }
         }
+
         if (resultNumber.includes('-')) {
           const firstOperation = resultNumber.findIndex(item => item == '-');
           const previousNumber = Number(resultNumber[firstOperation - 1]);
           const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
 
           if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber - afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
+            const result = String(previousNumber - afterNumber);
+            resultNumber.splice(firstOperation - 1, 3, result);
+            document.getElementById('res').value = result;
           }
         }
         if (resultNumber.includes('+')) {
           const firstOperation = resultNumber.findIndex(item => item == '+');
           const previousNumber = Number(resultNumber[firstOperation - 1]);
           const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
 
           if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber + afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
+            const result = String(previousNumber + afterNumber);
+            resultNumber.splice(firstOperation - 1, 3, result);
+            document.getElementById('res').value = result;
           }
         }
       }
@@ -146,24 +128,24 @@
   }
 
 
-  function insert(num, notNumber) {
+  function insert(value, notNumber) { // FIXME: avoid duplicating operators
     if (isLastEqual && !notNumber) {
-      ac();
+      clearInput();
     }
     isLastEqual = false;
-    if (num === '.') {
-      document.getElementById('res').value += num;
+    if (value === '.') {
+      document.getElementById('res').value += value;
       return;
     }
     if (document.getElementById('res').value === '0') {
-      document.getElementById('res').value = num;
+      document.getElementById('res').value = value;
     }
     else {
-      document.getElementById('res').value += num;
+      document.getElementById('res').value += value;
     }
   }
 
-  function ac() {
+  function clearInput() {
     document.getElementById('res').value = '0';
   }
 </script>
