@@ -21,28 +21,28 @@
     </div>
 
     <div class="buttons">
-      <div class="btn bg_btn_gray" id="ac" onclick="ac()">ac</div>
+      <div class="btn bg_btn_gray" id="ac" onclick="clearAll()">ac</div>
       <div class="btn bg_btn_gray" onclick="insert('+/-')">+/-</div>
       <div class="btn bg_btn_gray" onclick="insert('%')">%</div>
-      <div class="btn bg_btn_orange" onclick="insert('/', true)">/</div>
+      <div class="btn bg_btn_orange" onclick="insert(' / ', true)">/</div>
 
       <div class="btn" onclick="insert('7')">7</div>
       <div class="btn" onclick="insert('8')">8</div>
       <div class="btn" onclick="insert('9')">9</div>
-      <div class="btn bg_btn_orange" onclick="insert('*', true)">*</div>
+      <div class="btn bg_btn_orange" onclick="insert(' * ', true)">*</div>
 
       <div class="btn" onclick="insert('4')">4</div>
       <div class="btn" onclick="insert('5')">5</div>
       <div class="btn" onclick="insert('6')">6</div>
-      <div class="btn bg_btn_orange" onclick="insert('-', true)">-</div>
+      <div class="btn bg_btn_orange" onclick="insert(' - ', true)">-</div>
 
       <div class="btn" onclick="insert('1')">1</div>
       <div class="btn" onclick="insert('2')">2</div>
       <div class="btn" onclick="insert('3')">3</div>
-      <div class="btn bg_btn_orange" onclick="insert('+', true)">+</div>
+      <div class="btn bg_btn_orange" onclick="insert(' + ', true)">+</div>
 
       <div class="btn zero" onclick="insert('0')">0</div>
-      <div class="btn" onclick="insert('.')">.</div>
+      <div class="btn" onclick="insert('.', true)">.</div>
       <div class="btn equal bg_btn_orange" onclick="equal()">=</div>
     </div>
   </div>
@@ -50,120 +50,63 @@
   let isLastEqual = false;
   function equal() {
     const input = document.getElementById('res').value;
-    const resultNumber = input.split(/\+|\-|\*|\//);
-    const [operator] = input.match(/\+|\-|\*|\//);
+    const resultNumber = input.split(' ');
 
-    const obj = {
-      "+": (num1, num2) => (num1 + num2),
-      "-": (num1, num2) => (num1 - num2),
-      "*": (num1, num2) => Math.round((num1 * num2) * 10000)/10000,
-      "/": (num1, num2) => Math.round((num1 / num2)*10000)/10000,
+    function mathOperations(operationSign) {
+      const firstOperation = resultNumber.findIndex(item => item === operationSign);
+      const previousNumber = Number(resultNumber[firstOperation - 1]);
+      const afterNumber = Number(resultNumber[firstOperation + 1]);
+
+      if (isNaN(previousNumber) && isNaN(afterNumber)) {
+        alert('Your numbers is not valide');
+      }
+       if (firstOperation !== -1 && !isNaN(previousNumber) && !isNaN(afterNumber)) {
+        const calculation = {
+          "+": (previousNumber, afterNumber) => (previousNumber + afterNumber),
+          "-": (previousNumber, afterNumber) => (previousNumber - afterNumber),
+          "*": (previousNumber, afterNumber) => Math.round((previousNumber * afterNumber) * 100000) / 100000,
+          "/": (previousNumber, afterNumber) => Math.round((previousNumber / afterNumber) * 100000) / 100000,
+        }
+
+        const result = String(calculation[operationSign](previousNumber, afterNumber));
+        resultNumber.splice(firstOperation - 1, 3, result);
+        document.getElementById('res').value = result;
+        isLastEqual = true;
+      }
     }
-    const num1 = parseFloat(resultNumber[0]);
-    const num2 = parseFloat(resultNumber[1]); 
-    
-    if (isNaN(num1) && isNaN(num2)) {
-      alert('Your number is not valid!');
-    }
-    if (operator && !isNaN(num1) && !isNaN(num2) && resultNumber.length == 2) {
-      document.getElementById('res').value = (obj[operator](num1, num2));
-      isLastEqual = true;
-    }
+     for (let i = 0; i < resultNumber.length; i++) {
 
+      if (resultNumber.includes("*")) {
+        mathOperations("*");
+      }
 
-    if (resultNumber.length > 2) {
-      const input = document.getElementById('res').value;
-      // ((...args) => { console.log(args) })(...input)
+      if (resultNumber.includes("/")) {
+        mathOperations("/");
+      }
 
-      const resultNumber = input.split('');
-      console.log(input);
-      console.log(resultNumber);
-      
-       for (let i = 0; i < resultNumber.length; i++) {
-
-        if(resultNumber.includes('*')) {
-          const firstOperation = resultNumber.findIndex(item => item == '*');
-          const previousNumber = Number(resultNumber[firstOperation - 1]);
-          const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
-
-          if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber * afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
-          }
-        }
-        if (resultNumber.includes('/')) {
-          const firstOperation = resultNumber.findIndex(item => item == '/');
-          const previousNumber = Number(resultNumber[firstOperation - 1]);
-          const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
-
-          if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber / afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
-          }
-        }
-        if (resultNumber.includes('-')) {
-          const firstOperation = resultNumber.findIndex(item => item == '-');
-          const previousNumber = Number(resultNumber[firstOperation - 1]);
-          const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
-
-          if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber - afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
-          }
-        }
-        if (resultNumber.includes('+')) {
-          const firstOperation = resultNumber.findIndex(item => item == '+');
-          const previousNumber = Number(resultNumber[firstOperation - 1]);
-          const afterNumber = Number(resultNumber[firstOperation + 1]);
-          console.log(previousNumber);
-          console.log(afterNumber);
-
-          if (firstOperation && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-            const a = String(previousNumber + afterNumber);
-            console.log(a);
-            resultNumber.splice(firstOperation - 1, 3, a);
-            console.log(resultNumber);
-            document.getElementById('res').value = a;
-          }
-        }
+      if (resultNumber.includes("-")) {
+        mathOperations("-");
+      }
+      if (resultNumber.includes("+")) {
+        mathOperations("+");
       }
     }
   }
 
-
-  function insert(num, notNumber) {
+  function insert(value, notNumber) {
     if (isLastEqual && !notNumber) {
-      ac();
+      clearAll();
     }
     isLastEqual = false;
-    if (num === '.') {
-      document.getElementById('res').value += num;
-      return;
-    }
-    if (document.getElementById('res').value === '0') {
-      document.getElementById('res').value = num;
+    if (document.getElementById('res').value === '0' && !notNumber) {
+      document.getElementById('res').value =+ value;
     }
     else {
-      document.getElementById('res').value += num;
+      document.getElementById('res').value += value;
     }
   }
 
-  function ac() {
+  function clearAll() {
     document.getElementById('res').value = '0';
   }
 </script>
