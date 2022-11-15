@@ -24,90 +24,121 @@
       <div class="btn bg_btn_gray" id="ac" onclick="clearAll()">ac</div>
       <div class="btn bg_btn_gray" onclick="insert('+/-')">+/-</div>
       <div class="btn bg_btn_gray" onclick="insert('%')">%</div>
-      <div class="btn bg_btn_orange" onclick="insert(' / ', true)">/</div>
+      <div class="btn bg_btn_orange" onclick="insert(' / ')">/</div>
 
       <div class="btn" onclick="insert('7')">7</div>
       <div class="btn" onclick="insert('8')">8</div>
       <div class="btn" onclick="insert('9')">9</div>
-      <div class="btn bg_btn_orange" onclick="insert(' * ', true)">*</div>
+      <div class="btn bg_btn_orange" onclick="insert(' * ')">*</div>
 
       <div class="btn" onclick="insert('4')">4</div>
       <div class="btn" onclick="insert('5')">5</div>
       <div class="btn" onclick="insert('6')">6</div>
-      <div class="btn bg_btn_orange" onclick="insert(' - ', true)">-</div>
+      <div class="btn bg_btn_orange" onclick="insert(' - ')">-</div>
 
       <div class="btn" onclick="insert('1')">1</div>
       <div class="btn" onclick="insert('2')">2</div>
       <div class="btn" onclick="insert('3')">3</div>
-      <div class="btn bg_btn_orange" onclick="insert(' + ', true)">+</div>
+      <div class="btn bg_btn_orange" onclick="insert(' + ')">+</div>
 
       <div class="btn zero" onclick="insert('0')">0</div>
-      <div class="btn" onclick="insert('.', true)">.</div>
-      <div class="btn equal bg_btn_orange" onclick="equal()">=</div>
+      <div class="btn" onclick="insert('.')">.</div>
+      <div class="btn equal bg_btn_orange" onclick="calculate()">=</div>
     </div>
   </div>
 <script>
-  let isLastEqual = false;
-  function equal() {
-    const input = document.getElementById('res').value;
-    const resultNumber = input.split(' ');
-
-    function mathOperations(operationSign) {
-      const firstOperation = resultNumber.findIndex(item => item === operationSign);
-      const previousNumber = Number(resultNumber[firstOperation - 1]);
-      const afterNumber = Number(resultNumber[firstOperation + 1]);
-
-      if (isNaN(previousNumber) && isNaN(afterNumber)) {
-        alert('Your numbers is not valide');
-      }
-       if (firstOperation !== -1 && !isNaN(previousNumber) && !isNaN(afterNumber)) {
-        const calculation = {
-          "+": (previousNumber, afterNumber) => (previousNumber + afterNumber),
-          "-": (previousNumber, afterNumber) => (previousNumber - afterNumber),
-          "*": (previousNumber, afterNumber) => Math.round((previousNumber * afterNumber) * 100000) / 100000,
-          "/": (previousNumber, afterNumber) => Math.round((previousNumber / afterNumber) * 100000) / 100000,
-        }
-
-        const result = String(calculation[operationSign](previousNumber, afterNumber));
-        resultNumber.splice(firstOperation - 1, 3, result);
-        document.getElementById('res').value = result;
-        isLastEqual = true;
-      }
-    }
-     for (let i = 0; i < resultNumber.length; i++) {
-
-      if (resultNumber.includes("*")) {
-        mathOperations("*");
-      }
-
-      if (resultNumber.includes("/")) {
-        mathOperations("/");
-      }
-
-      if (resultNumber.includes("-")) {
-        mathOperations("-");
-      }
-      if (resultNumber.includes("+")) {
-        mathOperations("+");
-      }
-    }
+  let calculateIsLastAction = false;
+  const calculationMap = {
+    "+": (prev, next) => (prev + next),
+    "-": (prev, next) => (prev - next),
+    "*": (prev, next) => Math.round((prev * next) * 100000) / 100000,
+    "/": (prev, next) => Math.round((prev / next) * 100000) / 100000,
   }
 
-  function insert(value, notNumber) {
-    if (isLastEqual && !notNumber) {
-      clearAll();
-    }
-    isLastEqual = false;
-    if (document.getElementById('res').value === '0' && !notNumber) {
-      document.getElementById('res').value =+ value;
-    }
-    else {
-      document.getElementById('res').value += value;
-    }
+  function getArrayOfInput() {
+    return (document.getElementById('res').value).trim().split(' ');
+  }
+
+  function isOperation(value) {
+    return Object.keys(calculationMap).findIndex(operation => operation === value.trim()) !== -1;
+  }
+
+  function isDot(value) {
+    return value === '.';
   }
 
   function clearAll() {
     document.getElementById('res').value = '0';
+  }
+
+  function calculateOperation(operationSign, array) {
+    const operationIndex = array.findIndex(item => item === operationSign);
+    const previousNumber = Number(array[operationIndex - 1]);
+    const nextNumber = Number(array[operationIndex + 1]);
+
+    if (isNaN(previousNumber) && isNaN(nextNumber)) { // BAD CHECK but not used
+      alert('Your numbers is not valide');
+      return null;
+    }
+    if (operationIndex !== -1 && !isNaN(previousNumber) && !isNaN(nextNumber)) {
+      const result = String(calculationMap[operationSign](previousNumber, nextNumber));
+      array.splice(operationIndex - 1, 3, result);
+      return result;
+    }
+  }
+
+  function calculate() {
+    const arrayOfInput = getArrayOfInput();
+    let result;
+
+     for (let i = 0; i < arrayOfInput.length - 1; i++) {
+      if (arrayOfInput.includes("*")) {
+        result = calculateOperation("*", arrayOfInput);
+      }
+
+      if (arrayOfInput.includes("/")) {
+        result = calculateOperation("/", arrayOfInput);
+      }
+
+      if (arrayOfInput.includes("-")) {
+        result = calculateOperation("-", arrayOfInput);
+      }
+
+      if (arrayOfInput.includes("+")) {
+        result = calculateOperation("+", arrayOfInput);
+      }
+
+      if (result === null) {
+        clearAll();
+        return;
+      }
+      document.getElementById('res').value = result;
+    }
+    calculateIsLastAction = true;
+  }
+
+
+
+  function insert(value) {
+    const isNumber = !isOperation(value);
+    if (calculateIsLastAction && isNumber) {
+      clearAll();
+    }
+    const arrayOfInput = getArrayOfInput();
+    if (document.getElementById('res').value === '0' && isNumber && !isDot(value)) { // only in 0
+      document.getElementById('res').value =+ value;
+    } else if (isNumber || isDot(value)) { // only for numbers and dot
+      if (arrayOfInput[arrayOfInput.length - 1].includes('.') && isDot(value)) {
+        return;
+      }
+      document.getElementById('res').value += value;
+    } else { // only for operations
+      if (arrayOfInput.length && isOperation(arrayOfInput[arrayOfInput.length - 1])) {
+        return;
+      }
+      document.getElementById('res').value += value;
+    }
+    calculateIsLastAction = false;
   }
 </script>
 </body>
